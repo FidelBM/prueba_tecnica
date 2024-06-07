@@ -182,7 +182,7 @@ export default function Acertijo() {
                 animate={{x: 0}} // Posición final en la vista
                 transition={{duration: 0.5}} // Duración de la transición
             >
-                <p className={`text-[24px]  nunito m-3  `}> Tiempo
+                <p className={`text-[24px]  nunito m-3 `}> Tiempo
                     restante: {seconds}</p>
                 <div className="progress-bar m-1 border-2 border-black"
                      style={{width: `${seconds - 1}%`, backgroundColor: seconds <= 10 ? 'red' : '#4CAF50'}}></div>
