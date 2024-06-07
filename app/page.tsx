@@ -28,7 +28,7 @@ export default function Home() {
         // Define la función fetchUsers
         const fetchUsers = async () => {
             try {
-                const response = await axios.get(`https://pruebatecnicabackend-production-6b9e.up.railway.app/usuarios`); // Llama a la base de datos
+                const response = await axios.get(`http://localhost:8000/usuarios`); // Llama a la base de datos
                 const sortedUsers = response.data.sort((a:Usuario, b:Usuario) => Number(a.tiempo) - Number(b.tiempo)); // Ordena los usuarios por tiempo
                 setUsuarios(sortedUsers); // Actualiza el estado usuarios
                 setIsLoading(false); // Actualiza el estado isLoading
@@ -81,16 +81,17 @@ export default function Home() {
                             </button>
                         </div>
                     </div>
-                    <div>
-                        <h2 className="text-xl nunito-bold ">Top 5</h2>
-                        <table className="w-full text-center rtl:text-right text-gray-500 nunito">
-                            <thead className="text-xs text-gray-700 uppercase ">
-                            <tr className="px-6 py-3 text-[15px]">
+                    {usuarios.length > 0 ? (
+                        <div>
+                        <h2 className=" nunito-bold text-[20px] m-4">Top 5</h2>
+                        <table className="w-full text-center rtl:text-right text-gray-500 nunito ">
+                            <thead className=" text-gray-700 uppercase m-5 ">
+                            <tr className="px-6 py-3 text-[18px] ">
                                 <th className="w-1/2">Nombre</th>
                                 <th className="w-1/2">Tiempo</th>
                             </tr>
                             </thead>
-                            <tbody className=" border-b ">
+                            <tbody className=" border-b text-[18px]">
                             {usuarios.slice(0, 5).map((usuario) => (
                                 <tr key={usuario.id}>
                                     <td>{usuario.nombre}</td>
@@ -100,6 +101,8 @@ export default function Home() {
                             </tbody>
                         </table>
                     </div>
+                    ) : null}
+                    
                 </motion.div>
             </main>
         );

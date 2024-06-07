@@ -18,6 +18,7 @@ export default function Acertijo() {
     const [intervalId, setIntervalId] = useState<number | null>(null); // Nuevo estado para el identificador del intervalo
     const router = useRouter(); // Inicializa el hook useRouter
     const [errorNombre, setErrorNombre] = useState(false); // Nuevo estado para el error del nombre
+    const [isSubmitting, setIsSubmitting] = useState(false); // Estado para saber que se esta subiendo la infromacion
 
     // Define la función startTimer
     const startTimer = () => {
@@ -79,14 +80,19 @@ export default function Acertijo() {
             tiempo: tiempo.toString()
         }
 
+        setIsSubmitting(true); // Deshabilita el botón de envío
+
         // Sube el tiempo a la base de datos
         try {
-            const response = await axios.post('https://pruebatecnicabackend-production-6b9e.up.railway.app/usuarios', usuario); // Llama a la base de datos
+            const response = await axios.post('http://localhost:8000/usuarios', usuario); // Llama a la base de datos
             router.push('/'); // Redirige a la página principal
         } catch (error) {
             console.error(error);
+        } finally {
+            setIsSubmitting(false); // Habilita el botón de envío
         }
     }
+
 
 
     return (
@@ -161,7 +167,7 @@ export default function Acertijo() {
                             {errorNombre  && <p className="text-red-500 text-center">Porfavor coloque su nombre o sobrenombre</p>}
                             <div className="w-full flex justify-center text-center">
                                 <button
-
+                                    disabled={isSubmitting}
                                     className="learn-more m-4">Enviar
                                 </button>
                             </div>
@@ -178,8 +184,9 @@ export default function Acertijo() {
             >
                 <p className={`text-[24px]  nunito m-3  `}> Tiempo
                     restante: {seconds}</p>
-                <div className="progress-bar m-1"
+                <div className="progress-bar m-1 border-2 border-black"
                      style={{width: `${seconds - 1}%`, backgroundColor: seconds <= 10 ? 'red' : '#4CAF50'}}></div>
+                
                 <Image src={acertijo.src} alt="Acertijo" height={acertijo.height} width={acertijo.width}
                        className="rounded md:h-2/5 md:w-2/5 m-2  h-1/3 w-[90%]"/>
 
