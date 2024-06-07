@@ -8,8 +8,6 @@ import { useRouter } from 'next/navigation'; // Importa el hook useRouter
 
 export default function Acertijo() {
     const [seconds, setSeconds] = useState(60); // Nuevo estado para el tiempo
-    const [respuestaA, setRespuestaA] = useState(''); // Nuevo estado para la respuesta A
-    const [respuestaB, setRespuestaB] = useState(''); // Nuevo estado para la respuesta B
     const [respuestaC, setRespuestaC] = useState(''); // Nuevo estado para la respuesta C
     const [respuestaD, setRespuestaD] = useState(''); // Nuevo estado para la respuesta D
     const [nombre, setNombre] = useState(''); // Nuevo estado para el nombre del usuario
@@ -19,6 +17,7 @@ export default function Acertijo() {
     const [respuestaIncorrecta, setRespuestaIncorrecta] = useState(false); // Nuevo estado para la respuesta incorrecta
     const [intervalId, setIntervalId] = useState<number | null>(null); // Nuevo estado para el identificador del intervalo
     const router = useRouter(); // Inicializa el hook useRouter
+    const [errorNombre, setErrorNombre] = useState(false); // Nuevo estado para el error del nombre
 
     // Define la función startTimer
     const startTimer = () => {
@@ -47,15 +46,13 @@ export default function Acertijo() {
         event.preventDefault(); // Prevenir el comportamiento por defecto para que no recarge la página
         // Verifica si las respuestas son correctas
         if (
-            respuestaA === undefined || respuestaA === '' ||
-            respuestaB === undefined || respuestaB === '' ||
             respuestaC === undefined || respuestaC === '' ||
             respuestaD === undefined || respuestaD === ''
         ) {
             setRespuestaIncorrecta(true); // Muestra que la respuesta es incorrecta
         } else {
             // Verifica si las respuestas son correctas
-            if (parseInt(respuestaA) == 4 && parseInt(respuestaB) == 3 && parseInt(respuestaC) == 1 && parseInt(respuestaD) == 0) {
+            if (parseInt(respuestaC) == 1 && parseInt(respuestaD) == 0) {
                 setMensajeGanar(true); // Muestra el mensaje de ganar
                 if (intervalId !== null) {
                     clearInterval(intervalId); // Detener el tiempo si la respuesta es correcta
@@ -66,10 +63,15 @@ export default function Acertijo() {
         }
     }
 
-    // Define la función subirTiempo
+    // Define la función subir el nombre si contestaste correctamente
     const subirTiempo = async (event : React.FormEvent) => {
         event.preventDefault(); // Prevenir el comportamiento por defecto para que no recarge la página
         const tiempo = 60 - seconds; // Calcula el tiempo
+
+        if (nombre === undefined || nombre === '') {
+            setErrorNombre(true); // Muestra el error del nombre
+            return;
+        }
 
         // Crea un objeto usuario
         const usuario = {
@@ -79,7 +81,7 @@ export default function Acertijo() {
 
         // Sube el tiempo a la base de datos
         try {
-            const response = await axios.post('https://pruebatecnicabackend-production-6b9e.up.railway.app/usuarios', usuario); // Llama a la base de datos
+            const response = await axios.post('http://localhost:8000/usuarios', usuario); // Llama a la base de datos
             router.push('/'); // Redirige a la página principal
         } catch (error) {
             console.error(error);
@@ -94,7 +96,7 @@ export default function Acertijo() {
                 className="nunito flex h-full w-full items-center justify-center bg-[#80808080] absolute m-1 z-40 p-3 ">
 
                 <motion.div
-                    className="bg-white h-2/3 sm:h-1/2 md:w-1/2 w-full rounded-2xl flex flex-col items-center justify-center p-12"
+                    className="bg-white h-4/5 sm:h-1/2 md:w-1/2 w-full rounded-2xl flex flex-col items-center justify-center p-12"
                     initial={{scale: 0.1}} // Tamaño inicial pequeño
                     animate={{scale: [0, 1.1, 1]}} // Secuencia de tamaños: normal, más grande, normal
                     transition={{duration: 0.3, times: [0, 0.8, 1]}}>
@@ -114,7 +116,7 @@ export default function Acertijo() {
                     className="nunito flex h-full w-full items-center justify-center bg-[#80808080] absolute m-1 z-40 p-3 ">
 
                     <motion.div
-                        className="bg-white h-2/3 sm:h-1/2 md:w-1/2 w-full rounded-2xl flex flex-col items-center justify-center p-12"
+                        className="bg-white h-4/5 sm:h-1/2 md:w-1/2 w-full rounded-2xl flex flex-col items-center justify-center p-12"
                         initial={{scale: 0.1}} // Tamaño inicial pequeño
                         animate={{scale: [0, 1.1, 1]}} // Secuencia de tamaños: normal, más grande, normal
                         transition={{duration: 0.3, times: [0, 0.8, 1]}}>
@@ -135,14 +137,14 @@ export default function Acertijo() {
                 <div className="nunito flex h-full w-full items-center justify-center bg-[#80808080] absolute m-1 z-40 p-3">
 
                     <motion.div
-                        className="bg-white h-2/3 sm:h-1/2 md:w-1/2 w-full rounded-2xl flex flex-col items-center justify-center p-12"
+                        className="bg-white h-4/5 sm:h-1/2 md:w-1/2 w-full rounded-2xl flex flex-col items-center justify-center p-12"
                         initial={{scale: 0.1}} // Tamaño inicial pequeño
                         animate={{scale: [0, 1.1, 1]}} // Secuencia de tamaños: normal, más grande, normal
                         transition={{duration: 0.3, times: [0, 0.8, 1]}}
                     >
                         <h1 className="text-3xl font-bold text-black m-3 text-center">¡Haz ganado!</h1>
                         <p className="text-black text-[18px] text-center"> Felicidades haz resuelto el acertijo en {60 -seconds } segundos.</p>
-                        <p className="text-black text-[18px] text-center"> Ingresa tu nombre para guardar tu tiempo.</p>
+                        <p className="text-black text-[18px] text-center"> Ingresa tu nombre o sobrenombre para guardar tu tiempo.</p>
                         <form onSubmit={subirTiempo}>
                             <div className="flex items-center space-x-2 m-4">
                                 <label className="min-w-max">
@@ -156,10 +158,11 @@ export default function Acertijo() {
                                     className="w-full border-gray-400 rounded border-[1px] border-stroke bg-transparent px-4 py-1 text-black outline-none transition focus:border-gray-400 active:border-gray-500"
                                 />
                             </div>
+                            {errorNombre  && <p className="text-red-500 text-center">Porfavor coloque su nombre o sobrenombre</p>}
                             <div className="w-full flex justify-center text-center">
                                 <button
 
-                                    className="learn-more mt-4">Enviar
+                                    className="learn-more m-4">Enviar
                                 </button>
                             </div>
                         </form>
@@ -184,41 +187,9 @@ export default function Acertijo() {
 
 
                 <form className="text-[18px]">
-                    <div className="mb-4.5 m-1">
-                        <div className="max-w">
-                            <div className="flex items-center space-x-2 ">
-                                <label htmlFor="checkbox" className="min-w-max">
-                                    A =
-                                </label>
-                                <input
-                                    value={respuestaA}
-                                    onChange={(e) => setRespuestaA(e.target.value)}
-                                    type="number"
-                                    placeholder="Valor de A"
-                                    className="w-full border-gray-400 rounded border-[1px] border-stroke bg-transparent px-5 py-1 text-black outline-none transition focus:border-gray-400 active:border-gray-500"
-                                />
-                            </div>
-                        </div>
-                    </div>
 
-                    <div className="mb-4.5 m-1">
-                        <div className="max-w">
-                            <div className="flex items-center space-x-2">
-                                <label htmlFor="checkbox" className="min-w-max">
-                                    B =
-                                </label>
-                                <input
-                                    value={respuestaB}
-                                    onChange={(e) => setRespuestaB(e.target.value)}
-                                    type="number"
-                                    placeholder="Valor de B"
-                                    className="w-full border-gray-400 rounded border-[1.5px] border-stroke bg-transparent px-5 py-1 text-black outline-none transition focus:border-gray-400 active:border-gray-500  "
-                                />
-                            </div>
-                        </div>
-                    </div>
 
-                    <div className="mb-4.5 m-1">
+                    <div className="mb-4.5 m-2">
                         <div className="max-w">
                             <div className="flex items-center space-x-2">
                                 <label htmlFor="checkbox" className="min-w-max">
@@ -229,13 +200,13 @@ export default function Acertijo() {
                                     onChange={(e) => setRespuestaC(e.target.value)}
                                     type="number"
                                     placeholder="Valor de C"
-                                    className="w-full border-gray-400 rounded border-[1.5px] border-stroke bg-transparent px-5 py-1 text-black outline-none transition focus:border-gray-400 active:border-gray-500 "
+                                    className="w-full border-gray-400 rounded border-[1.5px] border-stroke bg-transparent px-5 py-2 text-black outline-none transition focus:border-gray-400 active:border-gray-500 "
                                 />
                             </div>
                         </div>
                     </div>
 
-                    <div className="mb-4.5 m-1">
+                    <div className="mb-4.5 m-2">
                         <div className="max-w">
                             <div className="flex items-center space-x-2">
                                 <label htmlFor="checkbox" className="min-w-max">
@@ -246,7 +217,7 @@ export default function Acertijo() {
                                     onChange={(e) => setRespuestaD(e.target.value)}
                                     type="number"
                                     placeholder="Valor de D"
-                                    className="w-full border-gray-400  rounded border-[1.5px] border-stroke bg-transparent px-5 py-1 text-black outline-none transition focus:border-gray-400 active:border-gray-500"
+                                    className="w-full border-gray-400  rounded border-[1.5px] border-stroke bg-transparent px-5 py-2 text-black outline-none transition focus:border-gray-400 active:border-gray-500"
                                 />
                             </div>
                         </div>

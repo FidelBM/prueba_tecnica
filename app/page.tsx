@@ -28,7 +28,7 @@ export default function Home() {
         // Define la función fetchUsers
         const fetchUsers = async () => {
             try {
-                const response = await axios.get(`https://pruebatecnicabackend-production-6b9e.up.railway.app/usuarios`); // Llama a la base de datos
+                const response = await axios.get(`http://localhost:8000/usuarios`); // Llama a la base de datos
                 const sortedUsers = response.data.sort((a:Usuario, b:Usuario) => Number(a.tiempo) - Number(b.tiempo)); // Ordena los usuarios por tiempo
                 setUsuarios(sortedUsers); // Actualiza el estado usuarios
                 setIsLoading(false); // Actualiza el estado isLoading
