@@ -84,7 +84,7 @@ export default function Acertijo() {
 
         // Sube el tiempo a la base de datos
         try {
-            const response = await axios.post('http://localhost:8000/usuarios', usuario); // Llama a la base de datos
+            const response = await axios.post('https://pruebatecnicabackend-production-6b9e.up.railway.app/usuarios', usuario); // Llama a la base de datos
             router.push('/'); // Redirige a la página principal
         } catch (error) {
             console.error(error);
